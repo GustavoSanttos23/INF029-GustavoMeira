@@ -48,10 +48,10 @@ void listarDisciplinas(Disciplina lista[], int qtd, Professor listaProf[], int q
             }
 
             // --- Exibe a Lista de Alunos da Disciplina ---
-            printf("Alunos Matriculados (%d/%d):\n", lista[i].qtdAlunosMatriculados, TAM_ALUNOS_POR_DISCIPLINA);
+            //printf("Alunos Matriculados (%d/%d):\n", lista[i].qtdAlunosMatriculados, TAM_ALUNOS_POR_DISCIPLINA);
             
             if (lista[i].qtdAlunosMatriculados == 0) {
-                printf("  -> Nenhum aluno matriculado nesta disciplina.\n");
+                //printf("  -> Nenhum aluno matriculado nesta disciplina.\n");
             } else {
                 for (int j = 0; j < lista[i].qtdAlunosMatriculados; j++) {
                     int matBusca = lista[i].listaMatriculasAlunos[j];
@@ -59,7 +59,7 @@ void listarDisciplinas(Disciplina lista[], int qtd, Professor listaProf[], int q
                     // Busca o nome do aluno na lista global pelo número da matrícula
                     for (int k = 0; k < qtdAlunos; k++) {
                         if (listaAlunos[k].matricula == matBusca) {
-                            printf("  - [%d] %s\n", listaAlunos[k].matricula, listaAlunos[k].nome);
+                            //printf("  - [%d] %s\n", listaAlunos[k].matricula, listaAlunos[k].nome);
                             break;
                         }
                     }
@@ -202,5 +202,62 @@ void atribuirAluno(Disciplina listaD[], int qtdD, Aluno listaA[], int qtdA) {
         }
     } else {
         printf("Erro: Disciplina ou Aluno nao encontrados!\n");
+    }
+}
+
+void buscarDisciplinaCompleta(Disciplina listaD[], int qtdD, Professor listaP[], int qtdP, Aluno listaA[], int qtdA) {
+    int cod, achei = -1;
+
+    printf("Digite o codigo da disciplina para busca detalhada: ");
+    scanf("%d", &cod);
+
+    // 1. Localiza a disciplina pelo código
+    for (int i = 0; i < qtdD; i++) {
+        if (listaD[i].codigo == cod && listaD[i].ativo == 1) {
+            achei = i;
+            break;
+        }
+    }
+
+    if (achei != -1) {
+        printf("\n==============================================\n");
+        printf("       DETALHES DA DISCIPLINA %d\n", listaD[achei].codigo);
+        printf("==============================================\n");
+        printf("NOME: %s\n", listaD[achei].nome);
+        printf("SEMESTRE: %d\n", listaD[achei].semestre);
+
+        // 2. Busca e exibe o Professor
+        if (listaD[achei].matriculaProfessor == -1) {
+            printf("PROFESSOR: [NAO ATRIBUIDO]\n");
+        } else {
+            for (int j = 0; j < qtdP; j++) {
+                if (listaP[j].matricula == listaD[achei].matriculaProfessor) {
+                    printf("PROFESSOR: %s (Mat: %d)\n", listaP[j].nome, listaP[j].matricula);
+                    break;
+                }
+            }
+        }
+
+        printf("----------------------------------------------\n");
+        printf("LISTA DE ALUNOS MATRICULADOS (%d):\n", listaD[achei].qtdAlunosMatriculados);
+
+        if (listaD[achei].qtdAlunosMatriculados == 0) {
+            printf("-> Nao ha alunos matriculados nesta disciplina.\n");
+        } else {
+            // 3. Percorre as matriculas salvas na disciplina e busca os nomes na lista global
+            for (int j = 0; j < listaD[achei].qtdAlunosMatriculados; j++) {
+                int matAluno = listaD[achei].listaMatriculasAlunos[j];
+                
+                for (int k = 0; k < qtdA; k++) {
+                    if (listaA[k].matricula == matAluno) {
+                        printf("   [%d] - %s\n", listaA[k].matricula, listaA[k].nome);
+                        break;
+                    }
+                }
+            }
+        }
+        printf("==============================================\n");
+    } else {
+        printf("\nErro: Disciplina com codigo %d nao encontrada.\n", cod);
     }
 }

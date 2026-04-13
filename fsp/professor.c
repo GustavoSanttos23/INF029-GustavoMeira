@@ -50,14 +50,65 @@ int cadastrarProfessor(Professor lista[], int qtd) {
 }
 
 void listarProfessores(Professor lista[], int qtd) {
+    if (qtd == 0) {
+        printf("Nenhum professor cadastrado.\n");
+        return;
+    }
+
+    int opcao;
+    printf("\n--- Opcoes de Listagem de Professores ---\n");
+    printf("1- Ordem de Cadastro\n");
+    printf("2- Ordem Alfabetica (A-Z)\n");
+    printf("3- Por Sexo\n");
+    printf("4- Por Data de Nascimento (Mais velhos primeiro)\n");
+    printf("Escolha: ");
+    scanf("%d", &opcao);
+
+    Professor listaCopia[TAM_PROFESSOR];
+    for(int i = 0; i < qtd; i++) {
+        listaCopia[i] = lista[i];
+    }
+
+    // Bubble Sort
+    if (opcao > 1 && opcao <= 4) {
+        for (int i = 0; i < qtd - 1; i++) {
+            for (int j = 0; j < qtd - i - 1; j++) {
+                int trocar = 0;
+
+                if (opcao == 2) { // Ordem Alfabética
+                    if (strcmp(listaCopia[j].nome, listaCopia[j + 1].nome) > 0) trocar = 1;
+                } 
+                else if (opcao == 3) { // Por Sexo
+                    if (listaCopia[j].sexo > listaCopia[j + 1].sexo) trocar = 1;
+                } 
+                else if (opcao == 4) { // Por Data de Nascimento
+                    if (listaCopia[j].data_nascimento.ano > listaCopia[j + 1].data_nascimento.ano) trocar = 1;
+                    else if (listaCopia[j].data_nascimento.ano == listaCopia[j + 1].data_nascimento.ano) {
+                        if (listaCopia[j].data_nascimento.mes > listaCopia[j + 1].data_nascimento.mes) trocar = 1;
+                        else if (listaCopia[j].data_nascimento.mes == listaCopia[j + 1].data_nascimento.mes) {
+                            if (listaCopia[j].data_nascimento.dia > listaCopia[j + 1].data_nascimento.dia) trocar = 1;
+                        }
+                    }
+                }
+
+                if (trocar) {
+                    Professor temp = listaCopia[j];
+                    listaCopia[j] = listaCopia[j + 1];
+                    listaCopia[j + 1] = temp;
+                }
+            }
+        }
+    }
+
     int encontrou = 0;
     for (int i = 0; i < qtd; i++) {
-        if (lista[i].ativo == 1) {
-            imprimirProfessor(lista[i]);
+        if (listaCopia[i].ativo == 1) {
+            imprimirProfessor(listaCopia[i]);
             encontrou = 1;
         }
     }
-    if (!encontrou) printf("Nenhum professor ativo cadastrado.\n");
+
+    if (!encontrou) printf("Nenhum professor ativo encontrado.\n");
 }
 
 void atualizarProfessor(Professor lista[], int qtd) {

@@ -20,7 +20,8 @@ int main() {
         printf("1- Modulo Aluno\n");
         printf("2- Modulo Professor\n");
         printf("3- Modulo Disciplina\n");
-        printf("4- Sair\n");
+        prinft("4- Bônus");
+        printf("5- Sair\n");
         printf("Escolha uma opcao: ");
         
         if (scanf("%d", &opcao) != 1) {
@@ -86,7 +87,8 @@ int main() {
                     printf("4- Excluir Disciplina\n");
                     printf("5- Atribuir Professor\n");
                     printf("6- Atribuir Aluno\n"); 
-                    printf("7- Voltar\n");
+                    printf("7- Busca detalhada por disciplina\n");
+                    printf("8- Voltar\n");
                     printf("Opcao: ");
                     scanf("%d", &opD);
 
@@ -97,20 +99,35 @@ int main() {
                         case 4: excluirDisciplina(listaDisc, qtdDisciplina); break;
                         case 5: atribuirProfessor(listaDisc, qtdDisciplina, listaProf, qtdProf); break;
                         case 6: atribuirAluno(listaDisc, qtdDisciplina, listaAluno, qtdAluno); break;
-                        case 7: sairD = 1; break;
+                        case 7: buscarDisciplinaCompleta(listaDisc, qtdDisciplina, listaProf, qtdProf, listaAluno, qtdAluno); break;
+                        case 8: sairD = 1; break;
                         default: printf("Opcao invalida!\n"); break;
                     }
                 }
                 break;
 
             case 4:
-                printf("Saindo do sistema... Ate logo!\n");
-                sair = 1;
-                break;
+                int sair = 0, opBo;
+                while(!sair){
+                    printf("--- Aba Bônus ---"); 
+                    printf("1- Aniversariantes do Mês\n");
+                    printf("2- Listar Disciplinas\n");
+                    printf("3- Atualizar Disciplina\n");
+                    printf("4- Excluir Disciplina\n");
+                    printf("5- Atribuir Professor\n");
+                    scanf("%d", &opBo);
 
-            default:
-                printf("Opcao invalida! Tente novamente.\n");
+                    switch(opBo){
+                        case 1: listarAniversariantesDoMes(listaAluno, qtdAluno, listaProf, qtdProf); break;
+                        case 2: buscarPessoaPorNome(listaAluno, qtdAluno, listaProf, qtdProf); break;
+                    }
+                }
+            
                 break;
+            case 5:
+                printf("Saindo do sistema... Ate logo!\n"); sair = 1; break;
+            default:
+                printf("Opcao invalida! Tente novamente.\n"); break;
         }
     }
 

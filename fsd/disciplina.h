@@ -23,5 +23,6 @@ void atualizarDisciplina(Disciplina lista[], int qtd);
 void excluirDisciplina(Disciplina lista[], int qtd);
 int atribuirProfessor(Disciplina listaD[], int qtdD, Professor listaP[], int qtdP);
 void atribuirAluno(Disciplina listaD[], int qtdD, Aluno listaA[], int qtdA);
+void buscarDisciplinaCompleta(Disciplina listaD[], int qtdD, Professor listaP[], int qtdP, Aluno listaA[], int qtdA);
 
 #endif

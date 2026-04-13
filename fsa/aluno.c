@@ -80,14 +80,62 @@ int cadastrarAluno(Aluno lista[], int qtd) {
 }
 
 void listarAlunos(Aluno lista[], int qtd) {
+    if (qtd == 0) {
+        printf("Nenhum aluno cadastrado.\n");
+        return;
+    }
+
+    int opcao;
+    printf("\n--- Opcoes de Listagem ---\n");
+    printf("1- Ordem de Cadastro\n");
+    printf("2- Ordem Alfabetica (A-Z)\n");
+    printf("3- Por Sexo\n");
+    printf("4- Por Data de Nascimento (Mais velhos primeiro)\n");
+    printf("Escolha: ");
+    scanf("%d", &opcao);
+    
+    Aluno listaCopia[TAM_ALUNO];
+    for(int i = 0; i < qtd; i++) listaCopia[i] = lista[i];
+
+    // Bubble Sort
+    if (opcao > 1 && opcao <= 4) {
+        for (int i = 0; i < qtd - 1; i++) {
+            for (int j = 0; j < qtd - i - 1; j++) {
+                int trocar = 0;
+
+                if (opcao == 2) { // Alfabetica
+                    if (strcmp(listaCopia[j].nome, listaCopia[j + 1].nome) > 0) trocar = 1;
+                } 
+                else if (opcao == 3) { // Sexo (F antes de M)
+                    if (listaCopia[j].sexo > listaCopia[j + 1].sexo) trocar = 1;
+                } 
+                else if (opcao == 4) { // Data de Nascimento
+                    if (listaCopia[j].data_nascimento.ano > listaCopia[j + 1].data_nascimento.ano) trocar = 1;
+                    else if (listaCopia[j].data_nascimento.ano == listaCopia[j + 1].data_nascimento.ano) {
+                        if (listaCopia[j].data_nascimento.mes > listaCopia[j + 1].data_nascimento.mes) trocar = 1;
+                        else if (listaCopia[j].data_nascimento.mes == listaCopia[j + 1].data_nascimento.mes) {
+                            if (listaCopia[j].data_nascimento.dia > listaCopia[j + 1].data_nascimento.dia) trocar = 1;
+                        }
+                    }
+                }
+
+                if (trocar) {
+                    Aluno temp = listaCopia[j];
+                    listaCopia[j] = listaCopia[j + 1];
+                    listaCopia[j + 1] = temp;
+                }
+            }
+        }
+    }
+
     int encontrou = 0;
     for (int i = 0; i < qtd; i++) {
-        if (lista[i].ativo == 1) {
-            imprimirAluno(lista[i]);
+        if (listaCopia[i].ativo == 1) {
+            imprimirAluno(listaCopia[i]);
             encontrou = 1;
         }
     }
-    if (!encontrou) printf("Nenhum aluno ativo cadastrado.\n");
+    if (!encontrou) printf("Nenhum aluno ativo encontrado.\n");
 }
 
 void atualizarAluno(Aluno lista[], int qtd) {
@@ -159,3 +207,89 @@ void excluirAluno(Aluno lista[], int qtd) {
     }
     printf("Matricula não encontrada.\n");
 }
+
+/*
+void listarAniversariantesDoMes(Aluno listaA[], int qtdA, Professor listaP[], int qtdP) {
+    int mesBusca;
+    int encontrou = 0;
+
+    printf("\n--- BUSCA DE ANIVERSARIANTES ---\n");
+    printf("Digite o numero do mes (1-12): ");
+    scanf("%d", &mesBusca);
+
+    if (mesBusca < 1 || mesBusca > 12) {
+        printf("Mes invalido!\n");
+        return;
+    }
+
+    printf("\n=== ANIVERSARIANTES DO MES %02d ===\n", mesBusca);
+
+    // Busca na lista de Alunos
+    printf("\n[ALUNOS]\n");
+    for (int i = 0; i < qtdA; i++) {
+        if (listaA[i].ativo == 1 && listaA[i].data_nascimento.mes == mesBusca) {
+            printf("Dia %02d - %s\n", listaA[i].data_nascimento.dia, listaA[i].nome);
+            encontrou = 1;
+        }
+    }
+
+    // Busca na lista de Professores
+    printf("\n[PROFESSORES]\n");
+    for (int i = 0; i < qtdP; i++) {
+        if (listaP[i].ativo == 1 && listaP[i].data_nascimento.mes == mesBusca) {
+            printf("Dia %02d - %s\n", listaP[i].data_nascimento.dia, listaP[i].nome);
+            encontrou = 1;
+        }
+    }
+
+    if (!encontrou) {
+        printf("\nNenhum aniversariante encontrado neste mes.\n");
+    }
+    printf("==================================\n");
+}
+
+void buscarPessoaPorNome(Aluno listaA[], int qtdA, Professor listaP[], int qtdP) {
+    char busca[50];
+    int encontrou = 0;
+
+    printf("\n--- BUSCA POR NOME ---\n");
+    printf("Digite pelo menos 3 letras para pesquisar: ");
+    scanf(" %s", busca);
+    limparBuffer();
+
+    // Validação de segurança: mínimo de 3 caracteres
+    if (strlen(busca) < 3) {
+        printf("Erro: Digite no minimo 3 caracteres para a busca.\n");
+        return;
+    }
+
+    printf("\nResultados da busca por: \"%s\"\n", busca);
+
+    // Busca na lista de Alunos
+    printf("\n[ALUNOS ENCONTRADOS]\n");
+    for (int i = 0; i < qtdA; i++) {
+        if (listaA[i].ativo == 1) {
+            // strstr retorna um ponteiro se achar a string, ou NULL se não achar
+            if (strstr(listaA[i].nome, busca) != NULL) {
+                printf("- %s (Mat: %d)\n", listaA[i].nome, listaA[i].matricula);
+                encontrou = 1;
+            }
+        }
+    }
+
+    // Busca na lista de Professores
+    printf("\n[PROFESSORES ENCONTRADOS]\n");
+    for (int i = 0; i < qtdP; i++) {
+        if (listaP[i].ativo == 1) {
+            if (strstr(listaP[i].nome, busca) != NULL) {
+                printf("- %s (Mat: %d)\n", listaP[i].nome, listaP[i].matricula);
+                encontrou = 1;
+            }
+        }
+    }
+
+    if (!encontrou) {
+        printf("\nNenhuma pessoa encontrada com o termo \"%s\".\n", busca);
+    }
+    printf("------------------------------------\n");
+} */

@@ -29,5 +29,6 @@ int cadastrarAluno(Aluno lista[], int qtd);
 void listarAlunos(Aluno lista[], int qtd);
 void atualizarAluno(Aluno lista[], int qtd);
 void excluirAluno(Aluno lista[], int qtd);
+void listarAniversariantesDoMes(Aluno listaA[], int qtdA, Professor listaP[], int qtdP);
 
 #endif
