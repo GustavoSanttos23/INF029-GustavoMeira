@@ -2,196 +2,257 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#define TAM_AlUNO 5
 
-typedef struct Data{
+#define TAM_ALUNO 5
+
+// --- Estruturas ---
+typedef struct Data {
     int dia;
     int mes;
     int ano;
-}Data;
+} Data;
 
-typedef struct Aluno{
+typedef struct Aluno {
     int matricula;
     char nome[50];
     char sexo;
     Data data_nascimento;
     char cpf[20];
     int ativo;
-}Aluno;
+} Aluno;
 
-int main(){
+// --- Funções Auxiliares e de Validação ---
 
-    Aluno listaAluno[TAM_AlUNO];
-    int opcao, sair = 0;
-    int qtdAluno = 0;
+Data lerDataValida() {
+    Data d;
+    
+    do {
+        printf("Digite o dia (1-31): ");
+        scanf("%d", &d.dia);
+        if(d.dia < 1 || d.dia > 31) printf("Dia invalido!\n");
+    } while(d.dia < 1 || d.dia > 31);
 
-    printf("Projeto escola\n\n");
+    do {
+        printf("Digite o mes (1-12): ");
+        scanf("%d", &d.mes);
+        if(d.mes < 1 || d.mes > 12) printf("Mes invalido!\n");
+    } while(d.mes < 1 || d.mes > 12);
 
-    while(sair != 1){
-        printf("1- Aluno\n");
-        printf("2- Professor\n");
-        printf("3- Disciplina\n");
-        printf("4- Sair\n");
-        scanf("%d", &opcao);
+    do {
+        printf("Digite o ano (1900-2026): ");
+        scanf("%d", &d.ano);
+        if(d.ano < 1900 || d.ano > 2026) printf("Ano invalido (1900-2026)!\n");
+    } while(d.ano < 1900 || d.ano > 2026);
 
-        switch (opcao){
-        case 1:
-            printf("---Modulo Aluno---\n\n");
-            int opcaoAluno, sairAluno = 0;
-            while(sairAluno != 1){
-                printf("1- Cadastrar Aluno\n");
-                printf("2- Listar Alunos\n");
-                printf("3- Atualizar Aluno\n");
-                printf("4- Excluir Aluno\n");
-                printf("5- Sair\n");
-                scanf("%d", &opcaoAluno);
-                printf("\n");
-                
-                switch(opcaoAluno){
-                    case 1:
-                        printf("Digite a matricula: ");
-                        int matricula;
-                        scanf("%d", &matricula);
-                        printf("\n");
+    return d;
+}
 
-                        if(matricula < 0){
-                            printf("Matricula invalida!\n");
-                        } else{ 
-                            if(qtdAluno == TAM_AlUNO){
-                                printf("Limite de alunos alcançado!\n");
-                            } else{
-                                listaAluno[qtdAluno].matricula = matricula;
-                                //FIM DO NUMERO DE MATRICULA
-                                
-                                //INICIO DO CPF
-                                printf("Digite o Cpf do Aluno: ");
-                                char cpf[20];
-                                scanf("%s", cpf);
-                                // LIMPEZA DO BUFFER
-                                int c;
-                                while ((c = getchar()) != '\n' && c != EOF);
-                                //FIM LIMPEZA
-                                printf("\n");
-                                int tamcpf = strlen(cpf);
-                                if(tamcpf != 11){
-                                    printf("Cpf Invalido!\n");
-                                }else{
-                                    strcpy(listaAluno[qtdAluno].cpf, cpf);
-                                    // FIM DO CPF
+void limparBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
 
-                                    // INICIO DO NOME
-                                    printf("Digite o Nome do Aluno: ");
-                                    char nome[50];
-                                    fgets(nome, 50, stdin);
-                                    printf("\n");
-                                    nome[strcspn(nome, "\n")] = 0;
-                                    strcpy(listaAluno[qtdAluno].nome, nome);
-                                    //FIM DO NOME
+void imprimirAluno(Aluno aluno) {
+    printf("---------- Dados do Aluno ----------\n");
+    printf("Nome: %s\n", aluno.nome);
+    printf("Matrícula: %d\n", aluno.matricula);
+    printf("Data de Nascimento: %02d/%02d/%04d\n", 
+            aluno.data_nascimento.dia, 
+            aluno.data_nascimento.mes, 
+            aluno.data_nascimento.ano);
+    printf("CPF: %s\n", aluno.cpf);
+    printf("Sexo: %c\n", aluno.sexo);
+    printf("------------------------------------\n\n");
+}
 
-                                    //INICIO DO SEXO
-                                    printf("Defina o Sexo do Aluno\n Selecione M para masculino e F para feminino: ");
-                                    char entrada;
-                                    scanf("%c", &entrada);
-                                    int c;
-                                    while ((c = getchar()) != '\n' && c != EOF);
-                                    printf("\n");
-                                    char MF[4] = "MmFf";
-                                    if(toupper(entrada) == 'M' || toupper(entrada) == 'F'){
-                                        listaAluno[qtdAluno].sexo = toupper(entrada);
-                                    } else {
-                                        printf("Invalido!\n");
-                                    }
-                                    //FIM DO SEXO
-                                    
-                                    //INICIO DATA NASCIMENTO
-                                    printf("Insira a Data de nascimento, seguindo as instruções a seguir:\n");
-                                    
-                                    printf("Digite a data do mês:(DATA/XX/XXXX): ");
-                                    int dia;
-                                    scanf("%d", &dia);
-                                    if(dia < 1 || dia > 31){
-                                        printf("Data invalida!\n");
-                                    } else{
-                                        listaAluno[qtdAluno].data_nascimento.dia = dia;
+// --- Funções de Operação ---
 
-                                        printf("Digite o mês(XX/MÊS/XXXX): ");
-                                        int mes;
-                                        scanf("%d", &mes);
-                                        if(mes < 1 || mes > 12){
-                                            printf("Mês invalido!\n");
-                                        }else{
-                                            listaAluno[qtdAluno].data_nascimento.mes = mes;
+int cadastrarAluno(Aluno lista[], int qtd) {
+    if (qtd >= TAM_ALUNO) {
+        printf("Erro: Limite de alunos alcançado!\n");
+        return qtd;
+    }
 
-                                            printf("Digite o Ano(XX/XX/ANO): ");
-                                            int ano;
-                                            scanf("%d", &ano);
-                                            if(ano < 1900 || ano > 2024){
-                                                printf("Ano invalido!\n");
-                                            } else{
-                                                listaAluno[qtdAluno].data_nascimento.ano = ano;
-                                                printf("Cadastro de aluno concluido, REF 0%d\n\n", qtdAluno);
-                                            }
-                                        }
-                                    }
-                                    //FIM DA DATA DE NASCIMENTO
-                                }
-                                qtdAluno++;
-                            }
-                        }
-                        break;
+    printf("Digite a matricula: ");
+    scanf("%d", &lista[qtd].matricula);
+    if (lista[qtd].matricula < 0) {
+        printf("Matricula invalida!\n");
+        return qtd;
+    }
 
-                    case 2:
-                        if(qtdAluno == 0){
-                            printf("Lista Vazia!\n");
-                        }else{
-                            for(int i=0; i < qtdAluno; i++){
-                                if(listaAluno[i].ativo != 1){
-                                    i++;
-                                }else{
-                                    printf("Aluno: %s\n", listaAluno[i].nome);
-                                    printf("Matrícula: %d\n", listaAluno[i].matricula);
-                                    printf("Data de Nascimento: %d/%d/%d\n", listaAluno[i].data_nascimento.dia, listaAluno[i].data_nascimento.mes, listaAluno[i].data_nascimento.ano);
-                                    printf("CPF: %s\n", listaAluno[i].cpf);
-                                    printf("Sexo: %c\n", listaAluno[i].sexo);
-                                    printf("\n");
-                                }
-                            }
-                        }
-                        break;
+    printf("Digite o CPF (apenas numeros): ");
+    scanf("%s", lista[qtd].cpf);
+    limparBuffer();
+    if (strlen(lista[qtd].cpf) != 11) {
+        printf("CPF Invalido!\n");
+        return qtd;
+    }
 
-                    case 3:
-                        printf("Atualização de aluno");
-                        break;
+    printf("Digite o Nome: ");
+    fgets(lista[qtd].nome, 50, stdin);
+    lista[qtd].nome[strcspn(lista[qtd].nome, "\n")] = 0;
 
-                    case 4:
-                        printf("Excluir aluno");
-                        break;
+    printf("Sexo (M/F): ");
+    char s;
+    scanf(" %c", &s);
+    lista[qtd].sexo = toupper(s);
 
-                    case 5:
-                        sairAluno = 1;
-                        break;
+    printf("Data de Nascimento:\n");
+    lista[qtd].data_nascimento = lerDataValida();
+    lista[qtd].ativo = 1;
+    printf("Cadastro concluido com sucesso! [REF %d]\n\n", qtd);
+    
+    return qtd + 1;
+}
 
-                    default:
-                        printf("Opção invalida!");
-                        break;
-                    }
-                }
-
-            break;
-        case 2:
-            printf("---Modulo Professor---\n");
-            break;
-        case 3:
-            printf("---Modulo Disciplina---\n");
-            break;
-        case 4:
-            sair = 1;
-            break;
-        default:
-            printf("Opção invalida!\n");
-            printf("Saida automatica a seguir\n");
-            sair = 1;
-            break;
+void listarAlunos(Aluno lista[], int qtd) {
+    int encontrou = 0;
+    for (int i = 0; i < qtd; i++) {
+        if (lista[i].ativo == 1) {
+            imprimirAluno(lista[i]);
+            encontrou = 1;
         }
     }
+    if (!encontrou) printf("Nenhum aluno ativo cadastrado.\n");
+}
+
+void atualizarAluno(Aluno lista[], int qtd) {
+    int mat;
+    printf("Digite a matricula para atualizar: ");
+    scanf("%d", &mat);
+
+    for (int i = 0; i < qtd; i++) {
+        if (lista[i].matricula == mat && lista[i].ativo == 1) {
+            int opcaoAt;
+            imprimirAluno(lista[i]);
+            printf("O que deseja alterar?\n1-Nome\n2-Matricula\n3-Data\n4-CPF\n5-Sexo\nOpcao: ");
+            scanf("%d", &opcaoAt);
+            limparBuffer();
+
+            switch (opcaoAt) {
+                case 1:
+                    printf("Novo Nome: ");
+                    fgets(lista[i].nome, 50, stdin);
+                    lista[i].nome[strcspn(lista[i].nome, "\n")] = 0;
+                    printf("Dados atualizados!\n");
+                    break;
+                case 2:
+                    printf("Nova Matricula: ");
+                    scanf("%d", &lista[i].matricula);
+                    printf("Dados atualizados!\n");
+                    break;
+                case 3:
+                    printf("Nova Data de Nascimento:\n");
+                    lista[i].data_nascimento = lerDataValida();
+                    printf("Dados atualizados!\n");
+                    break;
+                case 4:
+                    printf("Novo CPF: ");
+                    scanf("%s", lista[i].cpf);
+                    printf("Dados atualizados!\n");
+                    break;
+                case 5:
+                    printf("Novo Sexo (M/F): ");
+                    char s;
+                    scanf(" %c", &s);
+                    lista[i].sexo = toupper(s);
+                    printf("Dados atualizados!\n");
+                    break;
+                default:
+                    printf("Opção Invalido!\n;");
+                    break;
+            }
+            return;
+        }
+    }
+    printf("Matricula não encontrada.\n");
+}
+
+void excluirAluno(Aluno lista[], int qtd) {
+    int mat;
+    printf("Digite a matricula para excluir: ");
+    scanf("%d", &mat);
+
+    for (int i = 0; i < qtd; i++) {
+        if (lista[i].matricula == mat && lista[i].ativo == 1) {
+            char confirma;
+            printf("Confirmar exclusão de %s? (S/N): ", lista[i].nome);
+            scanf(" %c", &confirma);
+            if (toupper(confirma) == 'S') {
+                lista[i].ativo = 0;
+                printf("Excluido com sucesso!\n");
+            } else {
+                printf("Operação cancelada.\n");
+            }
+            return;
+        }
+    }
+    printf("Matricula não encontrada.\n");
+}
+
+int main() {
+    Aluno listaAluno[TAM_ALUNO];
+    int qtdAluno = 0;
+    int opcao, sair = 0;
+
+    while (sair != 1) {
+        printf("\n\t--- PROJETO ESCOLA ---\n\n");
+        printf("1- Modulo Aluno\n");
+        printf("2- Modulo Professor\n");
+        printf("3- Modulo Disciplina\n");
+        printf("4- Sair\n");
+        printf("Escolha uma opcao: ");
+        
+        if (scanf("%d", &opcao) != 1) {
+            limparBuffer();
+            continue;
+        }
+
+        switch (opcao) {
+            case 1: {
+                int opcaoAluno, sairAluno = 0;
+                while (sairAluno != 1) {
+                    printf("\n\t--- MENU ALUNO ---\n\n");
+                    printf("1- Cadastrar Aluno\n");
+                    printf("2- Listar Alunos\n");
+                    printf("3- Atualizar Aluno\n");
+                    printf("4- Excluir Aluno\n");
+                    printf("5- Voltar ao Menu Principal\n");
+                    printf("Opcao: ");
+                    scanf("%d", &opcaoAluno);
+                    
+                    switch (opcaoAluno) {
+                        case 1: qtdAluno = cadastrarAluno(listaAluno, qtdAluno); break;
+                        case 2: listarAlunos(listaAluno, qtdAluno); break;
+                        case 3: atualizarAluno(listaAluno, qtdAluno); break;
+                        case 4: excluirAluno(listaAluno, qtdAluno); break;
+                        case 5: sairAluno = 1; break;
+                        default: printf("Opcao invalida no modulo Aluno!\n"); break;
+                    }
+                }
+                break;
+            }
+
+            case 2:
+                printf("\n[AVISO] Modulo Professor em desenvolvimento...\n");
+                // Aqui voce chamaria funcoes como: qtdProf = cadastrarProfessor(listaProf, qtdProf);
+                break;
+
+            case 3:
+                printf("\n[AVISO] Modulo Disciplina em desenvolvimento...\n");
+                // Aqui voce chamaria funcoes como: cadastrarDisciplina(listaDisc, &qtdDisc);
+                break;
+
+            case 4:
+                printf("Saindo do sistema... Ate logo!\n");
+                sair = 1;
+                break;
+
+            default:
+                printf("Opcao invalida! Tente novamente.\n");
+                break;
+        }
+    }
+
+    return 0;
 }
