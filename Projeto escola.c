@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
 #include "util.h"
 #include "fsa/aluno.h"
 #include "fsp/professor.h"
@@ -10,6 +11,7 @@
 void listarAniversariantesDoMes(Aluno listaA[], int qtdA, Professor listaP[], int qtdP);
 void buscarPessoaPorNome(Aluno listaA[], int qtdA, Professor listaP[], int qtdP);
 void listarAlunosMuitasDisciplinas(Aluno listaA[], int qtdA);
+void gatoPiscando();
 
 int main() {
     Aluno listaAluno[TAM_ALUNO];
@@ -119,7 +121,7 @@ int main() {
                     printf("2- Buscar pessoa por nome\n");
                     printf("3- Listar alunos matriculados em pelo menos três disciplinas\n");
                     printf("4- Lista de disciplinas com mais de 40 alunos\n");
-                    printf("5- Atribuir Professor\n");
+                    printf("5- Creditos\n");
                     printf("6- Voltar\n");
                     scanf("%d", &opBo);
 
@@ -128,13 +130,14 @@ int main() {
                         case 2: buscarPessoaPorNome(listaAluno, qtdAluno, listaProf, qtdProf); break;
                         case 3: listarAlunosMuitasDisciplinas(listaAluno, qtdAluno); break;
                         case 4: listarDisciplinasLotadas(listaDisc, qtdDisciplina, listaProf, qtdProf); break;
+                        case 5: printf("--- GUSTAVO MEIRA ---"); gatoPiscando(); break;
                         case 6: sairBo=1; break;
                     }
                 }
             
                 break;
             case 5:
-                printf("Saindo do sistema... Ate logo!\n"); sair = 1; break;
+                printf("Saindo do sistema... Ate a proxima!\n"); sair = 1; break;
             default:
                 printf("Opcao invalida! Tente novamente.\n"); break;
         }
@@ -142,6 +145,8 @@ int main() {
 
     return 0;
 }
+
+//------------------------BÔNUS------------------------
 void listarAlunosMuitasDisciplinas(Aluno listaA[], int qtdA) {
     int encontrou = 0;
     const int MINIMO_DISCIPLINAS = 3;
@@ -162,5 +167,32 @@ void listarAlunosMuitasDisciplinas(Aluno listaA[], int qtdA) {
         printf("Nenhum aluno encontrado com matricula em pelo menos %d disciplinas.\n", MINIMO_DISCIPLINAS);
     }
     printf("----------------------------------------------------\n");
+}
+void delay(int ms) {
+    usleep(ms * 1000);
+}
+
+void gatoPiscando() {
+    for (int i = 0; i < 10; i++) { // número de piscadas
+        // Limpa a tela
+        printf("\033[2J\033[H");
+
+        // Olhos abertos
+        printf("   /\\_/\\\n");
+        printf("  ( o.o )\n");
+        printf("   > ^ <\n");
+
+        delay(500);
+
+        // Limpa a tela
+        printf("\033[2J\033[H");
+
+        // Olhos fechados
+        printf("   /\\_/\\\n");
+        printf("  ( -.- )\n");
+        printf("   > ^ <\n");
+
+        delay(200);
+    }
 }
 
