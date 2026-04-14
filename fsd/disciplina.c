@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "disciplina.h"
+#include "../util.h"
 
 int cadastrarDisciplina(Disciplina lista[], int qtd) {
     if (qtd >= TAM_DISCIPLINA) {
@@ -19,7 +20,7 @@ int cadastrarDisciplina(Disciplina lista[], int qtd) {
     printf("Semestre (1-10): ");
     scanf("%d", &lista[qtd].semestre);
 
-    lista[qtd].matriculaProfessor = -1; // -1 indica que não tem professor ainda
+    lista[qtd].matriculaProfessor = -1;
     lista[qtd].qtdAlunosMatriculados = 0;
     lista[qtd].ativo = 1;
 
@@ -35,7 +36,6 @@ void listarDisciplinas(Disciplina lista[], int qtd, Professor listaProf[], int q
             printf("DISCIPLINA: %s (Cod: %d)\n", lista[i].nome, lista[i].codigo);
             printf("Semestre: %d\n", lista[i].semestre);
             
-            // --- Exibe o Professor ---
             if (lista[i].matriculaProfessor == -1) {
                 printf("Professor: [NAO ATRIBUIDO]\n");
             } else {
@@ -47,7 +47,6 @@ void listarDisciplinas(Disciplina lista[], int qtd, Professor listaProf[], int q
                 }
             }
 
-            // --- Exibe a Lista de Alunos da Disciplina ---
             //printf("Alunos Matriculados (%d/%d):\n", lista[i].qtdAlunosMatriculados, TAM_ALUNOS_POR_DISCIPLINA);
             
             if (lista[i].qtdAlunosMatriculados == 0) {
@@ -56,7 +55,6 @@ void listarDisciplinas(Disciplina lista[], int qtd, Professor listaProf[], int q
                 for (int j = 0; j < lista[i].qtdAlunosMatriculados; j++) {
                     int matBusca = lista[i].listaMatriculasAlunos[j];
                     
-                    // Busca o nome do aluno na lista global pelo número da matrícula
                     for (int k = 0; k < qtdAlunos; k++) {
                         if (listaAlunos[k].matricula == matBusca) {
                             //printf("  - [%d] %s\n", listaAlunos[k].matricula, listaAlunos[k].nome);
@@ -80,7 +78,6 @@ int atribuirProfessor(Disciplina listaD[], int qtdD, Professor listaP[], int qtd
     printf("Matricula do Professor: ");
     scanf("%d", &mat);
 
-    // Busca disciplina
     for(int i = 0; i < qtdD; i++) {
         if(listaD[i].codigo == cod && listaD[i].ativo == 1) {
             acheiD = i;
@@ -88,7 +85,6 @@ int atribuirProfessor(Disciplina listaD[], int qtdD, Professor listaP[], int qtd
         }
     }
 
-    // Busca professor
     for(int i = 0; i < qtdP; i++) {
         if(listaP[i].matricula == mat && listaP[i].ativo == 1) {
             acheiP = i;
@@ -174,7 +170,6 @@ void atribuirAluno(Disciplina listaD[], int qtdD, Aluno listaA[], int qtdA) {
     printf("Matricula do Aluno: ");
     scanf("%d", &mat);
 
-    // 1. Busca a disciplina
     for(int i = 0; i < qtdD; i++) {
         if(listaD[i].codigo == cod && listaD[i].ativo == 1) {
             acheiD = i;
@@ -182,7 +177,6 @@ void atribuirAluno(Disciplina listaD[], int qtdD, Aluno listaA[], int qtdA) {
         }
     }
 
-    // 2. Busca o aluno
     for(int i = 0; i < qtdA; i++) {
         if(listaA[i].matricula == mat && listaA[i].ativo == 1) {
             acheiA = i;
@@ -191,11 +185,11 @@ void atribuirAluno(Disciplina listaD[], int qtdD, Aluno listaA[], int qtdA) {
     }
 
     if(acheiD != -1 && acheiA != -1) {
-        // Verifica se ainda há vaga na disciplina
         if (listaD[acheiD].qtdAlunosMatriculados < TAM_ALUNOS_POR_DISCIPLINA) {
             int pos = listaD[acheiD].qtdAlunosMatriculados;
             listaD[acheiD].listaMatriculasAlunos[pos] = mat;
             listaD[acheiD].qtdAlunosMatriculados++;
+            listaA[acheiA].qtdDisciplinasMatriculado++;
             printf("Aluno %s matriculado na disciplina %s!\n", listaA[acheiA].nome, listaD[acheiD].nome);
         } else {
             printf("Erro: Disciplina lotada!\n");
@@ -211,7 +205,6 @@ void buscarDisciplinaCompleta(Disciplina listaD[], int qtdD, Professor listaP[],
     printf("Digite o codigo da disciplina para busca detalhada: ");
     scanf("%d", &cod);
 
-    // 1. Localiza a disciplina pelo código
     for (int i = 0; i < qtdD; i++) {
         if (listaD[i].codigo == cod && listaD[i].ativo == 1) {
             achei = i;
@@ -226,7 +219,6 @@ void buscarDisciplinaCompleta(Disciplina listaD[], int qtdD, Professor listaP[],
         printf("NOME: %s\n", listaD[achei].nome);
         printf("SEMESTRE: %d\n", listaD[achei].semestre);
 
-        // 2. Busca e exibe o Professor
         if (listaD[achei].matriculaProfessor == -1) {
             printf("PROFESSOR: [NAO ATRIBUIDO]\n");
         } else {
@@ -244,7 +236,6 @@ void buscarDisciplinaCompleta(Disciplina listaD[], int qtdD, Professor listaP[],
         if (listaD[achei].qtdAlunosMatriculados == 0) {
             printf("-> Nao ha alunos matriculados nesta disciplina.\n");
         } else {
-            // 3. Percorre as matriculas salvas na disciplina e busca os nomes na lista global
             for (int j = 0; j < listaD[achei].qtdAlunosMatriculados; j++) {
                 int matAluno = listaD[achei].listaMatriculasAlunos[j];
                 
@@ -260,4 +251,48 @@ void buscarDisciplinaCompleta(Disciplina listaD[], int qtdD, Professor listaP[],
     } else {
         printf("\nErro: Disciplina com codigo %d nao encontrada.\n", cod);
     }
+}
+
+void listarDisciplinasLotadas(Disciplina listaD[], int qtdD, Professor listaP[], int qtdP) {
+    int encontrou = 0;
+    const int LIMITE = 40;
+
+    printf("\n--- DISCIPLINAS COM MAIS DE %d ALUNOS ---\n", LIMITE);
+
+    for (int i = 0; i < qtdD; i++) {
+        if (listaD[i].ativo == 1 && 
+            listaD[i].qtdAlunosMatriculados > LIMITE) {
+
+            printf("\nDisciplina: %s (Cod: %d)\n", 
+                   listaD[i].nome, listaD[i].codigo);
+
+            if (listaD[i].matriculaProfessor == -1) {
+                printf("Professor: [NAO ATRIBUIDO]\n");
+            } else {
+                int achouProf = 0;
+                for (int j = 0; j < qtdP; j++) {
+                    if (listaP[j].matricula == listaD[i].matriculaProfessor &&
+                        listaP[j].ativo == 1) {
+                        printf("Professor: %s\n", listaP[j].nome);
+                        achouProf = 1;
+                        break;
+                    }
+                }
+                if (!achouProf) {
+                    printf("Professor: [NAO ENCONTRADO]\n");
+                }
+            }
+
+            printf("Total de alunos: %d\n", 
+                   listaD[i].qtdAlunosMatriculados);
+
+            encontrou = 1;
+        }
+    }
+
+    if (!encontrou) {
+        printf("Nenhuma disciplina excede %d alunos.\n", LIMITE);
+    }
+
+    printf("----------------------------------------\n");
 }

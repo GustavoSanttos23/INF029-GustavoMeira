@@ -2,9 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "util.h"
 #include "fsa/aluno.h"
 #include "fsp/professor.h"
 #include "fsd/disciplina.h"
+
+void listarAniversariantesDoMes(Aluno listaA[], int qtdA, Professor listaP[], int qtdP);
+void buscarPessoaPorNome(Aluno listaA[], int qtdA, Professor listaP[], int qtdP);
+void listarAlunosMuitasDisciplinas(Aluno listaA[], int qtdA);
 
 int main() {
     Aluno listaAluno[TAM_ALUNO];
@@ -20,7 +25,7 @@ int main() {
         printf("1- Modulo Aluno\n");
         printf("2- Modulo Professor\n");
         printf("3- Modulo Disciplina\n");
-        prinft("4- Bônus");
+        printf("4- Bônus\n");
         printf("5- Sair\n");
         printf("Escolha uma opcao: ");
         
@@ -107,19 +112,23 @@ int main() {
                 break;
 
             case 4:
-                int sair = 0, opBo;
-                while(!sair){
-                    printf("--- Aba Bônus ---"); 
+                int sairBo = 0, opBo;
+                while(!sairBo){
+                    printf("\n\t--- Aba Bônus ---\n"); 
                     printf("1- Aniversariantes do Mês\n");
-                    printf("2- Listar Disciplinas\n");
-                    printf("3- Atualizar Disciplina\n");
-                    printf("4- Excluir Disciplina\n");
+                    printf("2- Buscar pessoa por nome\n");
+                    printf("3- Listar alunos matriculados em pelo menos três disciplinas\n");
+                    printf("4- Lista de disciplinas com mais de 40 alunos\n");
                     printf("5- Atribuir Professor\n");
+                    printf("6- Voltar\n");
                     scanf("%d", &opBo);
 
                     switch(opBo){
                         case 1: listarAniversariantesDoMes(listaAluno, qtdAluno, listaProf, qtdProf); break;
                         case 2: buscarPessoaPorNome(listaAluno, qtdAluno, listaProf, qtdProf); break;
+                        case 3: listarAlunosMuitasDisciplinas(listaAluno, qtdAluno); break;
+                        case 4: listarDisciplinasLotadas(listaDisc, qtdDisciplina, listaProf, qtdProf); break;
+                        case 6: sairBo=1; break;
                     }
                 }
             
@@ -133,3 +142,25 @@ int main() {
 
     return 0;
 }
+void listarAlunosMuitasDisciplinas(Aluno listaA[], int qtdA) {
+    int encontrou = 0;
+    const int MINIMO_DISCIPLINAS = 3;
+
+    printf("\n--- ALUNOS MATRICULADOS EM %d OU MAIS DISCIPLINAS ---\n", MINIMO_DISCIPLINAS);
+
+    for (int i = 0; i < qtdA; i++) {
+        if (listaA[i].ativo == 1 && listaA[i].qtdDisciplinasMatriculado >= MINIMO_DISCIPLINAS) {
+            printf("- Nome: %s (Mat: %d) | Disciplinas: %d\n", 
+                    listaA[i].nome, 
+                    listaA[i].matricula, 
+                    listaA[i].qtdDisciplinasMatriculado);
+            encontrou = 1;
+        }
+    }
+
+    if (!encontrou) {
+        printf("Nenhum aluno encontrado com matricula em pelo menos %d disciplinas.\n", MINIMO_DISCIPLINAS);
+    }
+    printf("----------------------------------------------------\n");
+}
+

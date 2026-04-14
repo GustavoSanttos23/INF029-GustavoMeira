@@ -1,7 +1,7 @@
 #ifndef PROFESSOR_H
 #define PROFESSOR_H
-#include "../fsa/aluno.h"
-#define TAM_PROFESSOR 5
+#include "../util.h"
+#define TAM_PROFESSOR 10
 
 typedef struct Professor {
     int matricula;
@@ -12,7 +12,6 @@ typedef struct Professor {
     int ativo;
 } Professor;
 
-// Protótipos
 int cadastrarProfessor(Professor lista[], int qtd);
 void listarProfessores(Professor lista[], int qtd);
 void atualizarProfessor(Professor lista[], int qtd);

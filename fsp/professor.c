@@ -1,4 +1,8 @@
+#include "../util.h"
 #include "professor.h"
+#include <stdio.h>
+#include <string.h>
+
 
 void imprimirProfessor(Professor prof) {
     printf("---------- Dados do Professor ----------\n");
