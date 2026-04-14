@@ -106,3 +106,31 @@ void buscarPessoaPorNome(Aluno listaA[], int qtdA, Professor listaP[], int qtdP)
     }
     printf("------------------------------------\n");
 }
+
+void delay(int ms) {
+    usleep(ms * 1000);
+}
+
+void gatoPiscando() {
+    for (int i = 0; i < 10; i++) { // número de piscadas
+        // Limpa a tela
+        printf("\033[2J\033[H");
+
+        // Olhos abertos
+        printf("   /\\_/\\\n");
+        printf("  ( o.o )\n");
+        printf("   > ^ <\n");
+
+        delay(500);
+
+        // Limpa a tela
+        printf("\033[2J\033[H");
+
+        // Olhos fechados
+        printf("   /\\_/\\\n");
+        printf("  ( -.- )\n");
+        printf("   > ^ <\n");
+
+        delay(200);
+    }
+}

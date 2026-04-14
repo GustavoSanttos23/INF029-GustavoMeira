@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
 
 typedef struct {
     int dia;
@@ -13,4 +14,5 @@ typedef struct {
 
 void limparBuffer();
 Data lerDataValida(); 
+void gatoPiscando();
 #endif
