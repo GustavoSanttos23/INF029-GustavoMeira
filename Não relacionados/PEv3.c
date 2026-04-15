@@ -5,7 +5,6 @@
 
 #define TAM_ALUNO 5
 
-// --- Estruturas ---
 typedef struct Data {
     int dia;
     int mes;
@@ -21,7 +20,6 @@ typedef struct Aluno {
     int ativo;
 } Aluno;
 
-// --- Funções Auxiliares e de Validação ---
 
 Data lerDataValida() {
     Data d;
@@ -64,8 +62,6 @@ void imprimirAluno(Aluno aluno) {
     printf("Sexo: %c\n", aluno.sexo);
     printf("------------------------------------\n\n");
 }
-
-// --- Funções de Operação ---
 
 int cadastrarAluno(Aluno lista[], int qtd) {
     if (qtd >= TAM_ALUNO) {
@@ -235,12 +231,10 @@ int main() {
 
             case 2:
                 printf("\n[AVISO] Modulo Professor em desenvolvimento...\n");
-                // Aqui voce chamaria funcoes como: qtdProf = cadastrarProfessor(listaProf, qtdProf);
                 break;
 
             case 3:
                 printf("\n[AVISO] Modulo Disciplina em desenvolvimento...\n");
-                // Aqui voce chamaria funcoes como: cadastrarDisciplina(listaDisc, &qtdDisc);
                 break;
 
             case 4:
