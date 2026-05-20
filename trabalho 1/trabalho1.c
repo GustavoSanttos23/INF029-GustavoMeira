@@ -76,164 +76,320 @@ int teste(int a)
     return val;
 }
 
-/*
- * Q1 = validar data
- @ *objetivo
- Validar uma data
- @entrada
- uma string data. Formatos que devem ser aceitos: dd/mm/aaaa, onde dd = dia, mm = mês, e aaaa, igual ao ano. dd em mm podem ter apenas um digito, e aaaa podem ter apenas dois digitos.
- @saida
- 0 -> se data inválida
- 1 -> se data válida
- @restrições
- Não utilizar funções próprias de string (ex: strtok)
- pode utilizar strlen para pegar o tamanho da string
- */
 int q1(char data[])
 {
-    int datavalida = 1;
+    DataQuebrada dq;
+    int anoBissexto = 0;
+    int diasNoMes;
 
-    //quebrar a string data em strings sDia, sMes, sAno
+    dq = quebraData(data);
 
-
-    //printf("%s\n", data);
-
-    if (datavalida)
-        return 1;
-    else
+    if (dq.valido == 0){
         return 0;
+    }
+
+    if (dq.iMes < 1 || dq.iMes > 12){
+        return 0;
+    }
+
+    if (dq.iDia < 1){
+        return 0;
+    }
+
+    if ((dq.iAno % 4 == 0 && dq.iAno % 100 != 0) || (dq.iAno % 400 == 0)){
+        anoBissexto = 1;
+    }
+
+    if (dq.iMes == 1 || dq.iMes == 3 || dq.iMes == 5 ||
+        dq.iMes == 7 || dq.iMes == 8 || dq.iMes == 10 ||
+        dq.iMes == 12){
+
+        diasNoMes = 31;
+
+    }else if (dq.iMes == 4 || dq.iMes == 6 ||
+              dq.iMes == 9 || dq.iMes == 11){
+
+        diasNoMes = 30;
+
+    }else{
+
+        // fevereiro
+        if (anoBissexto == 1){
+            diasNoMes = 29;
+        }else{
+            diasNoMes = 28;
+        }
+    }
+
+    if (dq.iDia > diasNoMes){
+        return 0;
+    }
+
+    return 1;
 }
 
 
 
-/*
- * Q2 = diferença entre duas datas
- * @objetivo
- *   Calcular a diferença em anos, meses e dias entre duas datas
- * @entrada
- *   uma string datainicial, uma string datafinal.
- * @saida
- *   Retorna um tipo DiasMesesAnos. No atributo retorno, deve ter os possíveis valores abaixo
- *   1 -> cálculo de diferença realizado com sucesso
- *   2 -> datainicial inválida
- *   3 -> datafinal inválida
- *   4 -> datainicial > datafinal
- *   Caso o cálculo esteja correto, os atributos qtdDias, qtdMeses e qtdAnos devem ser preenchidos com os valores correspondentes.
- */
 DiasMesesAnos q2(char datainicial[], char datafinal[])
 {
-
-    //calcule os dados e armazene nas três variáveis a seguir
     DiasMesesAnos dma;
+
+    DataQuebrada dataInicial;
+    DataQuebrada dataFinal;
+
+    int diasMes;
+
+    dataInicial = quebraData(datainicial);
+    dataFinal = quebraData(datafinal);
 
     if (q1(datainicial) == 0){
         dma.retorno = 2;
         return dma;
-    }else if (q1(datafinal) == 0){
-        dma.retorno = 3;
-        return dma;
-    }else{
-        //verifique se a data final não é menor que a data inicial
-
-        //calcule a distancia entre as datas
-
-
-        //se tudo der certo
-        dma.retorno = 1;
-        return dma;
-
     }
 
+    if (q1(datafinal) == 0){
+        dma.retorno = 3;
+        return dma;
+    }
+
+    if (dataInicial.iAno > dataFinal.iAno ||
+       (dataInicial.iAno == dataFinal.iAno &&
+        dataInicial.iMes > dataFinal.iMes) ||
+       (dataInicial.iAno == dataFinal.iAno &&
+        dataInicial.iMes == dataFinal.iMes &&
+        dataInicial.iDia > dataFinal.iDia)){
+
+        dma.retorno = 4;
+        return dma;
+    }
+
+    dma.qtdDias = dataFinal.iDia;
+    dma.qtdMeses = dataFinal.iMes;
+    dma.qtdAnos = dataFinal.iAno;
+
+    if (dma.qtdDias < dataInicial.iDia){
+
+        dma.qtdMeses--;
+
+        if (dataFinal.iMes == 1 || dataFinal.iMes == 3 ||
+            dataFinal.iMes == 5 || dataFinal.iMes == 7 ||
+            dataFinal.iMes == 8 || dataFinal.iMes == 10 ||
+            dataFinal.iMes == 12){
+
+            diasMes = 31;
+
+        }else if (dataFinal.iMes == 4 || dataFinal.iMes == 6 ||
+                  dataFinal.iMes == 9 || dataFinal.iMes == 11){
+
+            diasMes = 30;
+
+        }else{
+
+            if ((dataFinal.iAno % 4 == 0 && dataFinal.iAno % 100 != 0) ||
+                (dataFinal.iAno % 400 == 0)){
+
+                diasMes = 29;
+
+            }else{
+
+                diasMes = 28;
+            }
+        }
+
+        dma.qtdDias = dma.qtdDias + diasMes - dataInicial.iDia;
+
+    }else{
+
+        dma.qtdDias = dma.qtdDias - dataInicial.iDia;
+    }
+
+    if (dma.qtdMeses < dataInicial.iMes){
+
+        dma.qtdAnos--;
+
+        dma.qtdMeses = dma.qtdMeses + 12 - dataInicial.iMes;
+
+    }else{
+
+        dma.qtdMeses = dma.qtdMeses - dataInicial.iMes;
+    }
+
+    dma.qtdAnos = dma.qtdAnos - dataInicial.iAno;
+
+    dma.retorno = 1;
+
+    return dma;
 }
 
-/*
- * Q3 = encontrar caracter em texto
- * @objetivo
- *   Pesquisar quantas vezes um determinado caracter ocorre em um texto
- * @entrada
- *   uma string texto, um caracter c e um inteiro que informa se é uma pesquisa Case Sensitive ou não. Se isCaseSensitive = 1, a pesquisa deve considerar diferenças entre maiúsculos e minúsculos.
- *       Se isCaseSensitive != 1, a pesquisa não deve  considerar diferenças entre maiúsculos e minúsculos.
- * @saida
- *   Um número n >= 0.
- */
 int q3(char *texto, char c, int isCaseSensitive)
 {
-    int qtdOcorrencias = -1;
+    int i;
+    int qtdOcorrencias = 0;
+    char caractereTexto;
+    char caractereBusca;
+
+    for(i = 0; texto[i] != '\0'; i++){
+
+        caractereTexto = texto[i];
+        caractereBusca = c;
+
+        if(isCaseSensitive != 1){
+
+            if(caractereTexto >= 'A' && caractereTexto <= 'Z'){
+                caractereTexto = caractereTexto + 32;
+            }
+
+            if(caractereBusca >= 'A' && caractereBusca <= 'Z'){
+                caractereBusca = caractereBusca + 32;
+            }
+        }
+
+        if(caractereTexto == caractereBusca){
+            qtdOcorrencias++;
+        }
+    }
 
     return qtdOcorrencias;
 }
 
-/*
- * Q4 = encontrar palavra em texto
- * @objetivo
- *   Pesquisar todas as ocorrências de uma palavra em um texto
- * @entrada
- *   uma string texto base (strTexto), uma string strBusca e um vetor de inteiros (posicoes) que irá guardar as posições de início e fim de cada ocorrência da palavra (strBusca) no texto base (texto).
- * @saida
- *   Um número n >= 0 correspondente a quantidade de ocorrências encontradas.
- *   O vetor posicoes deve ser preenchido com cada entrada e saída correspondente. Por exemplo, se tiver uma única ocorrência, a posição 0 do vetor deve ser preenchido com o índice de início do texto, e na posição 1, deve ser preenchido com o índice de fim da ocorrencias. Se tiver duas ocorrências, a segunda ocorrência será amazenado nas posições 2 e 3, e assim consecutivamente. Suponha a string "Instituto Federal da Bahia", e palavra de busca "dera". Como há uma ocorrência da palavra de busca no texto, deve-se armazenar no vetor, da seguinte forma:
- *       posicoes[0] = 13;
- *       posicoes[1] = 16;
- *       Observe que o índice da posição no texto deve começar ser contado a partir de 1.
- *       O retorno da função, n, nesse caso seria 1;
- *
- */
 int q4(char *strTexto, char *strBusca, int posicoes[30])
 {
-    int qtdOcorrencias = -1;
+    int i, j;
+    int encontrou;
+    int qtdOcorrencias = 0;
+    int tamanhoBusca = 0;
+
+    while(strBusca[tamanhoBusca] != '\0'){
+        tamanhoBusca++;
+    }
+
+    for(i = 0; strTexto[i] != '\0'; i++){
+
+        encontrou = 1;
+
+        for(j = 0; j < tamanhoBusca; j++){
+
+            if(strTexto[i + j] != strBusca[j]){
+                encontrou = 0;
+                break;
+            }
+        }
+
+        if(encontrou == 1){
+
+            posicoes[qtdOcorrencias * 2] = i + 1;
+
+            posicoes[(qtdOcorrencias * 2) + 1] = i + tamanhoBusca;
+
+            qtdOcorrencias++;
+        }
+    }
 
     return qtdOcorrencias;
 }
-
-/*
- * Q5 = inverte número
- * @objetivo
- *   Inverter número inteiro
- * @entrada
- *   uma int num.
- * @saida
- *   Número invertido
- */
 
 int q5(int num)
 {
+    int numeroInvertido = 0;
+    int ultimoDigito;
 
-    return num;
+    while(num > 0){
+
+        ultimoDigito = num % 10;
+
+        numeroInvertido = (numeroInvertido * 10) + ultimoDigito;
+
+        num = num / 10;
+    }
+
+    return numeroInvertido;
 }
-
-/*
- * Q6 = ocorrência de um número em outro
- * @objetivo
- *   Verificar quantidade de vezes da ocorrência de um número em outro
- * @entrada
- *   Um número base (numerobase) e um número de busca (numerobusca).
- * @saida
- *   Quantidade de vezes que número de busca ocorre em número base
- */
 
 int q6(int numerobase, int numerobusca)
 {
-    int qtdOcorrencias;
+    int qtdOcorrencias = 0;
+
+    int baseTemp = numerobase;
+    int buscaTemp = numerobusca;
+
+    int tamanhoBusca = 0;
+    int divisor = 1;
+
+    while(buscaTemp > 0){
+        tamanhoBusca++;
+        buscaTemp = buscaTemp / 10;
+    }
+
+    for(int i = 0; i < tamanhoBusca; i++){
+        divisor = divisor * 10;
+    }
+
+    while(baseTemp > 0){
+
+        if(baseTemp % divisor == numerobusca){
+            qtdOcorrencias++;
+        }
+
+        baseTemp = baseTemp / 10;
+    }
+
     return qtdOcorrencias;
 }
 
-/*
- * Q7 = jogo busca palavras
- * @objetivo
- *   Verificar se existe uma string em uma matriz de caracteres em todas as direções e sentidos possíves
- * @entrada
- *   Uma matriz de caracteres e uma string de busca (palavra).
- * @saida
- *   1 se achou 0 se não achou
- */
-
 int q7(char matriz[8][10], char palavra[5])
 {
-    int achou;
-    return achou;
+    int i, j, k;
+
+    int direcaoLinha[8] = {-1,-1,-1,0,0,1,1,1};
+    int direcaoColuna[8] = {-1,0,1,-1,1,-1,0,1};
+
+    int novaLinha;
+    int novaColuna;
+
+    int encontrou;
+
+    // percorre toda matriz
+    for(i = 0; i < 8; i++){
+
+        for(j = 0; j < 10; j++){
+
+            // verifica todas as direções
+            for(int d = 0; d < 8; d++){
+
+                encontrou = 1;
+
+                // verifica letra por letra
+                for(k = 0; palavra[k] != '\0'; k++){
+
+                    novaLinha = i + (direcaoLinha[d] * k);
+                    novaColuna = j + (direcaoColuna[d] * k);
+
+                    // verifica limites da matriz
+                    if(novaLinha < 0 || novaLinha >= 8 ||
+                       novaColuna < 0 || novaColuna >= 10){
+
+                        encontrou = 0;
+                        break;
+                    }
+
+                    // compara caractere
+                    if(matriz[novaLinha][novaColuna] != palavra[k]){
+
+                        encontrou = 0;
+                        break;
+                    }
+                }
+
+                // se encontrou a palavra
+                if(encontrou == 1){
+                    return 1;
+                }
+            }
+        }
+    }
+
+    return 0;
 }
-
-
 
 DataQuebrada quebraData(char data[]){
     DataQuebrada dq;
